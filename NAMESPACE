@@ -1,0 +1,3 @@
+useDynLib(pedigree)
+export(add.Inds,errors.ped,countGen,
+       trimPed,makeAinv,makeA,calcInbreeding,orderPed)
