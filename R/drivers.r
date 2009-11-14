@@ -56,9 +56,9 @@ countGen <- function(ped)
 makeAinv <- function(ped)
   {
     if(!is.data.frame(ped))stop("ped should be data.frame")
-
     ord <- orderPed(ped)
-    ped <- ped[order(ord),]
+    if(!identical(ord,1:nrow(ped)))
+      stop("pedigree is not ordered.")
     idNames <- ped[,1]
     id <- 1:nrow(ped)
     dam <- match(ped[,2],ped[,1],nomatch = 0)
@@ -76,7 +76,8 @@ makeA <- function(ped,which)
     if(length(which)!=nrow(ped))stop("length which should coincide with nrow(ped)")
     which <- as.numeric(which)
     ord <- orderPed(ped)
-    ped <- ped[order(ord),]
+    if(!identical(ord,1:nrow(ped)))
+      stop("pedigree is not ordered.")
     idNames <- ped[,1]
     id <- 1:nrow(ped)
     dam <- match(ped[,2],ped[,1],nomatch = 0)
