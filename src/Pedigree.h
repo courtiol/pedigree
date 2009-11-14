@@ -9,18 +9,22 @@
 #include <iterator>
 using namespace std;
 
+const int max_gen = 1E6;
+
 class iNode;
 class Mij;
 class pedigree;
+
 
 class iNode
 {
  public:
   int ind,dam,sire;
-  int iNum,gen;
+  int iNum,gen,nOff;
   double f;
   bool getA;
-  iNode(const int i,const int d,const int s);
+  iNode(const int i,const int d,const int s); // constructor
+  ~iNode(){}; // desctructor
 };
 
 
@@ -47,6 +51,7 @@ class pedigree : public vector<iNode*>
   map<const Mij,double> C;
   map<const Mij,double> A,Ainv;
   void code(iNode *pInd);
+  void codeTrim(iNode *pInd);
  public:
   void codePedigree();
   void trimPedigree();
@@ -54,7 +59,9 @@ class pedigree : public vector<iNode*>
   void makeA();
   void writeAinv(string aFile);
   void writeA(string aFile);
+  void countOff();
   double getRij(const int dam,const int sire);
+  ~pedigree();
 };
 
 #endif

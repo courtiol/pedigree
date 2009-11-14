@@ -8,7 +8,19 @@ iNode::iNode(const int i,const int d,const int s)
   f = 0.0;
   iNum = -1;
   getA = false;
-  gen = 0;
+  gen = max_gen;
+  nOff = 0;
+}
+
+pedigree::~pedigree()
+{
+  iterator it;
+  iNode *pInd;
+  for(it = begin();it!=end();it++)
+    {
+      pInd = (*it);
+      delete pInd;
+    }
 }
 
 double pedigree::getRij(const int dam,const int sire)
@@ -92,20 +104,56 @@ void pedigree::writeA(string aFile)
   ainvFile.close();
 }
 
-//coderen en berekenen inteelt coefficient
-
 void pedigree::trimPedigree()
 {
-  COUNT = 0;
   iterator it;
   iNode *pInd;
   for(it = begin();it!=end();it++)
     {
       pInd = (*it);
-      if(pInd->iNum == 1){code(pInd);}
+      if(pInd->iNum == 0){codeTrim(pInd);} // betekent dat het dier data heeft we er zijn geweest
     }
   C.clear();
 }
+
+void pedigree::codeTrim(iNode *pInd)
+{
+  iNode *pDam,*pSire;
+  int gen;
+  gen = pInd->gen + 1; 		// ook hier lopen generaties vooruit
+  if(pInd->dam != 0)
+    {
+      pDam = (*this)[pInd->dam - 1];
+      if(pDam->gen > gen){pDam->gen = gen;}
+      if(pDam->iNum == -1){codeTrim(pDam);} // betekent nog niet gecodeerd
+    }
+  if(pInd->sire != 0)
+    {
+      pSire = (*this)[pInd->sire - 1];
+      if(pSire->gen > gen){pSire->gen = gen;}
+      if(pSire->iNum == -1){codeTrim(pSire);} // betekent nog niet gecodeerd
+    }
+  pInd->iNum = 1;
+}
+
+void pedigree::countOff()
+{
+  reverse_iterator rit;
+  iNode *pInd,*pDam,*pSire;
+  for(rit = rbegin();rit<rend();rit++)
+    {
+      pInd = (*rit);
+      if(pInd->dam != 0){
+	pDam = (*this)[pInd->dam - 1];
+	pDam->nOff = pDam->nOff + pInd->nOff + 1; //noff of this individual plus itself
+      }
+      if(pInd->sire != 0){
+	pSire = (*this)[pInd->sire - 1];
+	pSire->nOff = pSire->nOff + pInd->nOff + 1; //noff of this individual plus itself
+      }
+    }
+}
+
 
 void pedigree::codePedigree()
 {
@@ -127,14 +175,14 @@ void pedigree::code(iNode *pInd)
   if(pInd->dam != 0)
     {
       pDam = (*this)[pInd->dam - 1];
-      if(pDam->iNum == -1)code(pDam);
+      if(pDam->iNum == -1){code(pDam);}
       gDam = pDam->gen + 1;
     }
   
   if(pInd->sire != 0)
     {
       pSire = (*this)[pInd->sire - 1];
-      if(pSire->iNum == -1)code(pSire);
+      if(pSire->iNum == -1){code(pSire);}
       gSire = pSire->gen + 1;
     }
   COUNT++;
@@ -233,19 +281,43 @@ void pedigree::writeAinv(string aFile)
 extern "C"{
   void orderPed(int *ind,int *dam,int *sire,int *n,int *order)
   {
-    pedigree ped;
+    pedigree *ped;
     iNode *IND;
     unsigned i;
+    ped = new pedigree();
     for(i = 0;i<*n;i++)
       {
 	IND = new iNode(ind[i],dam[i],sire[i]);
-	ped.push_back(IND);
+	ped->push_back(IND);
       }
-    ped.codePedigree();
+    ped->codePedigree();
     for(i = 0;i<*n;i++)
       {
-	order[i] = ped[i]->iNum;
+	order[i] = (*ped)[i]->iNum;
       }
+    delete ped;
+  }
+}
+
+extern "C"{
+  void countOff(int *ind,int *dam,int *sire,int *n,int *nOff)
+  {
+    pedigree *ped;
+    iNode *IND;
+    unsigned i;
+    ped = new pedigree();
+    for(i = 0;i<*n;i++)
+      {
+	IND = new iNode(ind[i],dam[i],sire[i]);
+	ped->push_back(IND);
+      }
+    ped->codePedigree();
+    ped->countOff();
+    for(i = 0;i<*n;i++)
+      {
+	nOff[i] = (*ped)[i]->nOff;
+      }
+    delete ped;
   }
 }
 
@@ -269,23 +341,30 @@ extern "C"{
 }
 
 extern "C"{
-  void trimPed(int *ind,int *dam,int *sire,int *data,int *n)
+  void trimPed(int *ind,int *dam,int *sire,int *data,int *ngenback,int *n)
   {
-    pedigree ped;
+    pedigree *ped;
     iNode *IND;
     unsigned i;
+    ped = new pedigree();
     for(i = 0;i<*n;i++)
       {
 	IND = new iNode(ind[i],dam[i],sire[i]);
-	ped.push_back(IND);
-	if(data[i]==1){IND->iNum = 1;}
+	ped->push_back(IND);
+	if(data[i]==1){
+	  IND->iNum = 0;
+	  IND->gen = 0; // als dier data heeft dan gen = 0
+	}
       }
-    ped.trimPedigree();
+    ped->trimPedigree();
     for(i = 0;i<*n;i++)
       {
-	if(ped[i]->iNum != -1){data[i] = 1;}
+	if((*ped)[i]->iNum ==1){
+	  if((*ped)[i]->gen<=(*ngenback)){data[i] = 1;}
+	} // hoeft geen rekening met NULL te houden, iNum van deze dieren is -1
 	else {data[i] = 0;}
       }
+    delete ped;
   }
 }
     
@@ -293,18 +372,20 @@ extern "C"{
   void getAinv(int *ind,int *dam,int *sire,int *n)
   {
     string aFile = "Ainv.txt";
-    pedigree ped;
+    pedigree *ped;
     iNode *IND;
     unsigned i;
+    ped = new pedigree();
     for(i = 0;i<*n;i++)
       {
 	IND = new iNode(ind[i],dam[i],sire[i]);
-	ped.push_back(IND);
-	IND->f = ped.getRij(IND->dam,IND->sire);
+	ped->push_back(IND);
+	IND->f = ped->getRij(IND->dam,IND->sire);
 	IND->iNum = i+1;
       }
-    ped.makeAinv();
-    ped.writeAinv(aFile);
+    ped->makeAinv();
+    ped->writeAinv(aFile);
+    delete ped;
   }
 }
 
@@ -312,19 +393,21 @@ extern "C" {
   void getA (int *ind,int *dam,int *sire,int *n,int *which)
   {
     string aFile = "A.txt";
-    pedigree ped;
+    pedigree *ped;
     iNode *IND;
     unsigned i;
+    ped = new pedigree();
     for(i = 0;i<*n;i++)
       {
 	IND = new iNode(ind[i],dam[i],sire[i]);
-	ped.push_back(IND);
-	IND->f = ped.getRij(IND->dam,IND->sire);
+	ped->push_back(IND);
+	IND->f = ped->getRij(IND->dam,IND->sire);
 	IND->iNum = i+1;
 	if(which[i] == 1){IND->getA = true;}
       }
-    ped.makeA();
-    ped.writeA(aFile);
+    ped->makeA();
+    ped->writeA(aFile);
+    delete ped;
   }
 }
 
@@ -332,16 +415,18 @@ extern "C" {
 extern "C" {
   void calcInbreeding (int *ind,int *dam,int *sire,int *n,double *F)
   {
-    pedigree ped;
+    pedigree *ped;
     iNode *IND;
     unsigned i;
+    ped = new pedigree();
     for(i = 0;i<*n;i++)
       {
 	IND = new iNode(ind[i],dam[i],sire[i]);
-	ped.push_back(IND);
-	IND->f = ped.getRij(IND->dam,IND->sire);
+	ped->push_back(IND);
+	IND->f = ped->getRij(IND->dam,IND->sire);
 	F[i] = IND->f;
       }
+    delete ped;
   }
 }
 

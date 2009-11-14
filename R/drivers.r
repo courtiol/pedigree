@@ -1,3 +1,18 @@
+countOff <- function(ped)
+  {
+    if(!is.data.frame(ped))stop("ped should be data.frame")
+    ord <- orderPed(ped)
+    ped <- ped[order(ord),]    
+    idNames <- ped[,1]
+    id <- 1:nrow(ped)
+    dam <- match(ped[,2],ped[,1],nomatch = 0)
+    sire <- match(ped[,3],ped[,1],nomatch = 0)
+    n <- length(id)
+    nOff <- .C("countOff",ind = as.integer(id),dam = as.integer(dam),sire = as.integer(sire),
+               n = as.integer(n),nOff = as.integer(rep(0,n)))$nOff
+    return(nOff[ord])
+  }
+
 calcInbreeding <- function(ped)
   {
     if(!is.data.frame(ped))stop("ped should be data.frame")
@@ -10,8 +25,7 @@ calcInbreeding <- function(ped)
     n <- length(id)
     f <- .C("calcInbreeding",ind = as.integer(id),dam = as.integer(dam),sire = as.integer(sire),
             n = as.integer(n),f = as.double(rep(0,n)))$f
-    names(f) <- idNames
-    return(f)
+    return(f[ord])
   }
 
 orderPed <- function(ped)
@@ -30,7 +44,7 @@ orderPed <- function(ped)
 countGen <- function(ped)
   {
     if(!is.data.frame(ped))stop("ped should be data.frame")
-
+    
     id <- 1:nrow(ped)
     dam <- match(ped[,2],ped[,1],nomatch = 0)
     sire <- match(ped[,3],ped[,1],nomatch = 0)
@@ -73,7 +87,7 @@ makeA <- function(ped,which)
     return(TRUE)
   }
 
-trimPed <- function(ped,data)
+trimPed <- function(ped,data,ngenback = NULL)
   {
     if(!is.data.frame(ped))stop("ped should be data.frame")
     if(length(data) != nrow(ped))stop("length of data should coincide with nrow of pedigree")
@@ -82,8 +96,10 @@ trimPed <- function(ped,data)
     sire <- match(ped[,3],ped[,1],nomatch = 0)
     data <- as.integer(data>0)
     n <- length(id)
+    if(is.null(ngenback))
+      ngenback <- as.integer(max(countGen(ped)))
     .C("trimPed",ind = as.integer(id),dam = as.integer(dam),sire = as.integer(sire),
-       data = as.integer(data),n = as.integer(n))$data==1
+       data = as.integer(data),ngenback = as.integer(ngenback),n = as.integer(n))$data==1
   }
     
 
