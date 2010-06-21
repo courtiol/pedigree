@@ -35,19 +35,23 @@ gblup <- function (formula, data, M, lambda)
 {
   ## houd er rekening mee dat M groter kan zijn dan data
   if(!all.vars(formula)%in%colnames(data))
-    stop("Formule bevat variabelen die niet in data voorkomen.")
+    stop("Formul has variables which do not appear in the data.")
+  if(!"ID"%in%colnames(data))
+    stop("Data should have a column with ID's of the individuals called ID")
+  
   data <- merge(data,data.frame(ID = rownames(M)),by = 'ID',all.x = FALSE,all.y = TRUE)
   data$ID <- factor(data$ID)
-  ww <- match(all.vars(formula)[-1],colnames(data)) ## na in phenotype geeft niet, wil geen na's in verkl. vars
-  data <- data[apply(data,1,function(x)
-                     !any(is.na(x[ww]))),]
-
-  M <- M[match(rownames(M),data$ID),] ## zo ook Z de goede volgorde
+  depVar <- match(all.vars(formula)[1],colnames(data))
+  indVars <-  match(all.vars(formula)[-1],colnames(data))
+  if(length(indVars)>0)
+    data <- data[apply(as.matrix(data[,indVars]),1,function(x)all(!is.na(x))),]
+  
+  M <- M[match(data$ID,rownames(M)),] ## to give M and thus Z the good order
   X <- Matrix(model.matrix(formula,data))
   Y <- Matrix(model.frame(formula,data)[,1])
-  Z <- Matrix(model.matrix(data[,all.vars(formula)[1]]~data$ID))
+  Z <- Matrix(model.matrix(data[,depVar]~data$ID))
   
-  Ginv <- calcG(M,##data = data[,match(all.vars(formula)[1],colnames(data))] ,
+  Ginv <- calcG(M,data = data[,match(all.vars(formula)[1],colnames(data))] ,
                 solve = TRUE)
   xtx <- crossprod(X)
   xtz <- crossprod(X,Z)
