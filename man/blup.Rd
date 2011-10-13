@@ -8,7 +8,7 @@
   of this package.
 }
 \usage{
-blup(formula, ped, alpha)
+blup(formula, ped, alpha,trim = FALSE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -16,7 +16,9 @@ blup(formula, ped, alpha)
     due to animal (generally ID).}
   \item{ped}{\code{data.frame} with columns corresponding to ID, SIRE,
     DAM and the columns in the formula.}
-  \item{alpha}{Variance ratio (\eqn{\frac{\sigma^2_e}{\sigma^ 2_a}})}
+  \item{alpha}{Variance ratio (\eqn{\frac{\sigma^2_e}{\sigma^ 2_a}}).}
+  \item{trim}{If \code{TRUE}, trims the pedigree using the available
+    phenotype data using function \code{\link[pedigree]{trimPed}}.}
 }
 \value{
   Vector of solutions to the model, including random animal effects.}

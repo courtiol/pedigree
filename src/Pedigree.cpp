@@ -178,7 +178,7 @@ void pedigree::code(iNode *pInd)
       if(pDam->iNum == -1){code(pDam);}
       gDam = pDam->gen + 1;
     }
-  
+
   if(pInd->sire != 0)
     {
       pSire = (*this)[pInd->sire - 1];
@@ -214,7 +214,7 @@ void pedigree::makeAinv()
 	  i = pInd->iNum;d = pDam->iNum;s = pSire->iNum;
 	  if(s>d)
 	    {
-	      d = pSire->iNum; 
+	      d = pSire->iNum;
 	      s = pDam->iNum;
 	    }
 	  Aij.i = Aij.j = i;
@@ -324,19 +324,21 @@ extern "C"{
 extern "C"{
   void countGen (int *ind,int *dam,int *sire,int *n,int *gen)
   {
-    pedigree ped;
+    pedigree *ped;
     iNode *IND;
     unsigned i;
+    ped = new pedigree();
     for(i = 0;i<*n;i++)
       {
 	IND = new iNode(ind[i],dam[i],sire[i]);
-	ped.push_back(IND);
+	ped->push_back(IND);
       }
-    ped.codePedigree();
+    ped->codePedigree();
     for(i = 0;i<*n;i++)
       {
-	gen[i] = ped[i]->gen;
+	gen[i] = (*ped)[i]->gen;
       }
+    delete ped;
   }
 }
 
@@ -367,7 +369,7 @@ extern "C"{
     delete ped;
   }
 }
-    
+
 extern "C"{
   void getAinv(int *ind,int *dam,int *sire,int *n)
   {
@@ -433,6 +435,6 @@ extern "C" {
 
 
 
-    
-  
-  
+
+
+
