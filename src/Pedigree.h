@@ -20,7 +20,7 @@ class iNode
 {
  public:
   int ind,dam,sire;
-  int iNum,gen,nOff;
+  int iNum,gen,nOff,act,loop;
   double f;
   bool getA;
   iNode(const int i,const int d,const int s); // constructor

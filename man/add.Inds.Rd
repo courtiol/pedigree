@@ -1,6 +1,5 @@
 \name{add.Inds}
 \alias{add.Inds}
-%- Also NEED an '\alias' for EACH other topic documented here.
 \title{Function to add missing individuals to a pedigree}
 \description{
   Function add.Inds() adds missing individuals to a pedigree and returns the
@@ -18,9 +17,8 @@ add.Inds(ped)
 \value{
   data.frame of three columns with identical header as input.
 }
-\references{}
 \author{Albart Coster, Albart.Coster@wur.nl}
-\seealso{ \code{\link{errors.ped}}}
+\seealso{ \code{\link{orderPed}}}
 \examples{
 ID <- 3:5
 DAM <- c(1,1,3)

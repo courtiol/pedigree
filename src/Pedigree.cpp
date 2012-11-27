@@ -10,6 +10,8 @@ iNode::iNode(const int i,const int d,const int s)
   getA = false;
   gen = max_gen;
   nOff = 0;
+  act = -1; // indicates that the individual is not being visited by a recursive function at this moment
+  loop = -1; // indicates that the individual is involved in a loop, should check this individual
 }
 
 pedigree::~pedigree()
@@ -94,7 +96,7 @@ void pedigree::writeA(string aFile)
   ofstream ainvFile;
   ainvFile.open(aFile.c_str());
   ainvFile.setf(ios_base::left,ios_base::adjustfield);
-  map<Mij,double>::iterator it;
+  map<const Mij,double>::iterator it;
   Mij Aij;
   for(it = A.begin();it!=A.end();it++)
     {
@@ -172,25 +174,62 @@ void pedigree::code(iNode *pInd)
 {
   iNode *pDam,*pSire;
   int gDam = 0,gSire = 0;
-  if(pInd->dam != 0)
+  if(pInd->act==-1)
     {
-      pDam = (*this)[pInd->dam - 1];
-      if(pDam->iNum == -1){code(pDam);}
-      gDam = pDam->gen + 1;
-    }
+      pInd->act = 1;
+      if(pInd->dam != 0)
+	{
+	  pDam = (*this)[pInd->dam - 1];
+	  if(pDam->iNum == -1){code(pDam);}
+	  gDam = pDam->gen + 1;
+	}
 
-  if(pInd->sire != 0)
-    {
-      pSire = (*this)[pInd->sire - 1];
-      if(pSire->iNum == -1){code(pSire);}
-      gSire = pSire->gen + 1;
+      if(pInd->sire != 0)
+	{
+	  pSire = (*this)[pInd->sire - 1];
+	  if(pSire->iNum == -1){code(pSire);}
+	  gSire = pSire->gen + 1;
+	}
+      COUNT++;
+      pInd->iNum = COUNT;
+      pInd->gen = gDam;
+      if(gSire > gDam){pInd->gen = gSire;}
+      //cout<<pInd->gen<<endl;
+      pInd->act = -1;
     }
-  COUNT++;
-  pInd->iNum = COUNT;
-  pInd->gen = gDam;
-  if(gSire > gDam){pInd->gen = gSire;}
-  //cout<<pInd->gen<<endl;
+  else
+    {
+      pInd->loop = 1;
+    }
 }
+
+// extern function to order a pedigree
+extern "C"{
+  void orderPed(int *ind,int *dam,int *sire,int *n,int *order)
+  {
+    pedigree *ped;
+    iNode *IND;
+    int i;
+    ped = new pedigree();
+    for(i = 0;i<*n;i++)
+      {
+	IND = new iNode(ind[i],dam[i],sire[i]);
+	ped->push_back(IND);
+      }
+    ped->codePedigree();
+    for(i = 0;i<*n;i++)
+      {
+	if((*ped)[i]->loop==1)
+	  {
+	    order[i] = -1;
+	  }
+	else
+	  order[i] = (*ped)[i]->iNum;
+      }
+    delete ped;
+  }
+}
+
 
 //maak Ainv matrix
 void pedigree::makeAinv()
@@ -266,7 +305,7 @@ void pedigree::writeAinv(string aFile)
   ofstream ainvFile;
   ainvFile.open(aFile.c_str());
   ainvFile.setf(ios_base::left,ios_base::adjustfield);
-  map<Mij,double>::iterator it;
+  map<const Mij,double>::iterator it;
   Mij Aij;
   for(it = Ainv.begin();it!=Ainv.end();it++)
     {
@@ -279,32 +318,11 @@ void pedigree::writeAinv(string aFile)
 
 // externe functies
 extern "C"{
-  void orderPed(int *ind,int *dam,int *sire,int *n,int *order)
-  {
-    pedigree *ped;
-    iNode *IND;
-    unsigned i;
-    ped = new pedigree();
-    for(i = 0;i<*n;i++)
-      {
-	IND = new iNode(ind[i],dam[i],sire[i]);
-	ped->push_back(IND);
-      }
-    ped->codePedigree();
-    for(i = 0;i<*n;i++)
-      {
-	order[i] = (*ped)[i]->iNum;
-      }
-    delete ped;
-  }
-}
-
-extern "C"{
   void countOff(int *ind,int *dam,int *sire,int *n,int *nOff)
   {
     pedigree *ped;
     iNode *IND;
-    unsigned i;
+    int i;
     ped = new pedigree();
     for(i = 0;i<*n;i++)
       {
@@ -326,7 +344,7 @@ extern "C"{
   {
     pedigree *ped;
     iNode *IND;
-    unsigned i;
+    int i;
     ped = new pedigree();
     for(i = 0;i<*n;i++)
       {
@@ -347,7 +365,7 @@ extern "C"{
   {
     pedigree *ped;
     iNode *IND;
-    unsigned i;
+    int i;
     ped = new pedigree();
     for(i = 0;i<*n;i++)
       {
@@ -376,7 +394,7 @@ extern "C"{
     string aFile = "Ainv.txt";
     pedigree *ped;
     iNode *IND;
-    unsigned i;
+    int i;
     ped = new pedigree();
     for(i = 0;i<*n;i++)
       {
@@ -397,7 +415,7 @@ extern "C" {
     string aFile = "A.txt";
     pedigree *ped;
     iNode *IND;
-    unsigned i;
+    int i;
     ped = new pedigree();
     for(i = 0;i<*n;i++)
       {
@@ -419,7 +437,7 @@ extern "C" {
   {
     pedigree *ped;
     iNode *IND;
-    unsigned i;
+    int i;
     ped = new pedigree();
     for(i = 0;i<*n;i++)
       {

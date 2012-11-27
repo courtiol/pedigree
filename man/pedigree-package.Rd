@@ -21,7 +21,6 @@
   \code{\link[pedigree]{makeA}}
   \code{\link[pedigree]{makeAinv}}
   \code{\link[pedigree]{calcInbreeding}}
-  \code{\link[pedigree]{errors.ped}}
   \code{\link[pedigree]{add.Inds}}
 }
 

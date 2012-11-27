@@ -35,7 +35,7 @@ calcG <- function(M,data = NULL,solve = FALSE)
 gblup <- function (formula, data, M, lambda)
 {
   ## houd er rekening mee dat M groter kan zijn dan data
-    if(any(!all.vars(formula)%in%colnames(ped)))
+    if(any(!all.vars(formula)%in%colnames(data)))
         stop("Formula has variables which are not present in the data.")
     if(!"ID"%in%colnames(data))
         stop("Data should have a column with ID's of the individuals called ID")

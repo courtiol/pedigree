@@ -1,8 +1,8 @@
 \name{makeA}
 \alias{makeA}
-\title{Makes A matrix for a part of a pedigree}
+\title{Makes the A matrix for a part of a pedigree}
 \description{
-  Makes inverted A matrix for a part of a pedigree and stores it in a file called
+  Makes the A matrix for a part of a pedigree and stores it in a file called
   \code{A.txt}.}
   \usage{
 makeA(ped,which)

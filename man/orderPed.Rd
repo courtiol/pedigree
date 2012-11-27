@@ -23,6 +23,8 @@ pedigree <- data.frame(id,dam,sire)
 pedigree <- pedigree[6:1,]
 (ord <- orderPed(pedigree))
 pedigree <- pedigree[order(ord),]
+pwrong <- pedigree
+pwrong[1,2] <- pwrong[6,1]
 }
 \keyword{utilities}
 

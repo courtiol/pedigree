@@ -1,5 +1,5 @@
 import("Matrix","HaploSim")
 useDynLib(pedigree)
-export("add.Inds","calcG","calcInbreeding","countOff","errors.ped",
-       "blup","calcG","countGen","gblup","calcInbreeding","errors.ped",
+export("add.Inds","calcG","calcInbreeding","countOff",
+       "blup","calcG","countGen","gblup","calcInbreeding",
        "makeA","makeAinv","trimPed","orderPed")

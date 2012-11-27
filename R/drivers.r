@@ -2,7 +2,9 @@ countOff <- function(ped)
   {
     if(!is.data.frame(ped))stop("ped should be data.frame")
     ord <- orderPed(ped)
-    ped <- ped[order(ord),]    
+    if(!identical(ord,1:nrow(ped)))
+        stop("pedigree is not ordered.")
+    ped <- ped[order(ord),]
     idNames <- ped[,1]
     id <- 1:nrow(ped)
     dam <- match(ped[,2],ped[,1],nomatch = 0)
@@ -17,6 +19,8 @@ calcInbreeding <- function(ped)
   {
     if(!is.data.frame(ped))stop("ped should be data.frame")
     ord <- orderPed(ped)
+    if(!identical(ord,1:nrow(ped)))
+        stop("pedigree is not ordered.")
     ped <- ped[order(ord),]
     idNames <- ped[,1]
     id <- 1:nrow(ped)
@@ -30,7 +34,8 @@ calcInbreeding <- function(ped)
 
 orderPed <- function(ped)
   {
-    if(!is.data.frame(ped))stop("ped should be data.frame")
+    if(!is.data.frame(ped))
+        stop("ped should be data.frame")
 
     id <- 1:nrow(ped)
     dam <- match(ped[,2],ped[,1],nomatch = 0)
@@ -38,13 +43,18 @@ orderPed <- function(ped)
     n <- length(id)
     ord <- .C("orderPed",ind = as.integer(id),dam = as.integer(dam),sire = as.integer(sire),
               n = as.integer(n),order = as.integer(rep(0,n)))$order
+    if(-1%in%ord)
+        warning("Be carefull, there are loops in the pedigree, individuals involved in the loop are indicated with a -1\n")
     return(ord)
   }
 
 countGen <- function(ped)
   {
-    if(!is.data.frame(ped))stop("ped should be data.frame")
-    
+    if(!is.data.frame(ped))
+        stop("ped should be data.frame")
+    ord <- orderPed(ped)
+    if(!identical(ord,1:nrow(ped)))
+        stop("pedigree is not ordered.")
     id <- 1:nrow(ped)
     dam <- match(ped[,2],ped[,1],nomatch = 0)
     sire <- match(ped[,3],ped[,1],nomatch = 0)
@@ -90,8 +100,13 @@ makeA <- function(ped,which)
 
 trimPed <- function(ped,data,ngenback = NULL)
   {
-    if(!is.data.frame(ped))stop("ped should be data.frame")
-    if(length(data) != nrow(ped))stop("length of data should coincide with nrow of pedigree")
+    if(!is.data.frame(ped))
+        stop("ped should be data.frame")
+    if(length(data) != nrow(ped))
+        stop("length of data should coincide with nrow of pedigree")
+    ord <- orderPed(ped)
+    if(!identical(ord,1:nrow(ped)))
+      stop("pedigree is not ordered.")
     id <- 1:nrow(ped)
     dam <- match(ped[,2],ped[,1],nomatch = 0)
     sire <- match(ped[,3],ped[,1],nomatch = 0)
@@ -102,5 +117,5 @@ trimPed <- function(ped,data,ngenback = NULL)
     .C("trimPed",ind = as.integer(id),dam = as.integer(dam),sire = as.integer(sire),
        data = as.integer(data),ngenback = as.integer(ngenback),n = as.integer(n))$data==1
   }
-    
+
 
