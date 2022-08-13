@@ -27,16 +27,29 @@ gblup(formula, data, M, lambda)
    \code{\link[pedigree]{makeAinv}},\code{\link[pedigree]{blup}}
 }
 \examples{
+## Example Code from SampleHaplotypes
+hList <- HaploSim::SampleHaplotypes(nHaplotypes = 20,genDist =
+1,nDec = 3,nLoc = 20) ## create objects
+h <- HaploSim::SampleHaplotype(H0 = hList[[1]],H1 = hList[[2]],genDist =
+1,nDec = 3)
+
+## code from the Example SamplePedigree
+ID <- 1:10
+pID0 <- c(rep(0,5),1,1,3,3,5)
+pID1 <- c(rep(0,4),2,2,2,4,4,6)
+ped <- data.frame(ID,pID0,pID1)
+phList <- HaploSim::SamplePedigree(orig = hList,ped = ped)
+
+## own code
 h2 <- 0.5
-example(SamplePedigree)
 ped <- phList$ped
 hList <- phList$hList
-qtlList <- ListQTL(hList = hList,frqtl = 0.1,sigma2qtl = 1)
+qtlList <- HaploSim::ListQTL(hList = hList,frqtl = 0.1,sigma2qtl = 1)
 qtl <- tapply(unlist(qtlList),list(rep(names(qtlList),times = unlist(lapply(qtlList,length))),
                    unlist(lapply(qtlList,function(x)seq(1,length(x))))),mean,na.rm = TRUE)
-qtl <- melt(qtl)
+qtl <- reshape::melt(qtl)
 names(qtl) <- c("POS","TRAIT","a")
-HH <- getAll(hList,translatePos = FALSE)
+HH <- HaploSim::getAll(hList,translatePos = FALSE)
 rownames(HH) <- sapply(hList,function(x)x@hID)
 QQ <- HH[,match(qtl$POS,colnames(HH))]
 g <- QQ%*%matrix(qtl$a,ncol = 1)

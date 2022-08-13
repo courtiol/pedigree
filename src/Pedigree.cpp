@@ -205,7 +205,7 @@ void pedigree::code(iNode *pInd)
 
 // extern function to order a pedigree
 extern "C"{
-  void orderPed(int *ind,int *dam,int *sire,int *n,int *order)
+  void CorderPed(int *ind,int *dam,int *sire,int *n,int *order)
   {
     pedigree *ped;
     iNode *IND;
@@ -318,7 +318,7 @@ void pedigree::writeAinv(string aFile)
 
 // externe functies
 extern "C"{
-  void countOff(int *ind,int *dam,int *sire,int *n,int *nOff)
+  void CcountOff(int *ind,int *dam,int *sire,int *n,int *nOff)
   {
     pedigree *ped;
     iNode *IND;
@@ -340,7 +340,7 @@ extern "C"{
 }
 
 extern "C"{
-  void countGen (int *ind,int *dam,int *sire,int *n,int *gen)
+  void CcountGen (int *ind,int *dam,int *sire,int *n,int *gen)
   {
     pedigree *ped;
     iNode *IND;
@@ -361,7 +361,7 @@ extern "C"{
 }
 
 extern "C"{
-  void trimPed(int *ind,int *dam,int *sire,int *data,int *ngenback,int *n)
+  void CtrimPed(int *ind,int *dam,int *sire,int *data,int *ngenback,int *n)
   {
     pedigree *ped;
     iNode *IND;
@@ -389,7 +389,7 @@ extern "C"{
 }
 
 extern "C"{
-  void getAinv(int *ind,int *dam,int *sire,int *n)
+  void CgetAinv(int *ind,int *dam,int *sire,int *n)
   {
     string aFile = "Ainv.txt";
     pedigree *ped;
@@ -410,7 +410,7 @@ extern "C"{
 }
 
 extern "C" {
-  void getA (int *ind,int *dam,int *sire,int *n,int *which)
+  void CgetA (int *ind,int *dam,int *sire,int *n,int *which)
   {
     string aFile = "A.txt";
     pedigree *ped;
@@ -433,7 +433,7 @@ extern "C" {
 
 //geeft inteeltcoefficienten weer
 extern "C" {
-  void calcInbreeding (int *ind,int *dam,int *sire,int *n,double *F)
+  void CcalcInbreeding (int *ind,int *dam,int *sire,int *n,double *F)
   {
     pedigree *ped;
     iNode *IND;

@@ -10,7 +10,7 @@ countOff <- function(ped)
     dam <- match(ped[,2],ped[,1],nomatch = 0)
     sire <- match(ped[,3],ped[,1],nomatch = 0)
     n <- length(id)
-    nOff <- .C("countOff",ind = as.integer(id),dam = as.integer(dam),sire = as.integer(sire),
+    nOff <- .C("CcountOff",ind = as.integer(id),dam = as.integer(dam),sire = as.integer(sire),
                n = as.integer(n),nOff = as.integer(rep(0,n)))$nOff
     return(nOff[ord])
   }
@@ -27,7 +27,7 @@ calcInbreeding <- function(ped)
     dam <- match(ped[,2],ped[,1],nomatch = 0)
     sire <- match(ped[,3],ped[,1],nomatch = 0)
     n <- length(id)
-    f <- .C("calcInbreeding",ind = as.integer(id),dam = as.integer(dam),sire = as.integer(sire),
+    f <- .C("CcalcInbreeding",ind = as.integer(id),dam = as.integer(dam),sire = as.integer(sire),
             n = as.integer(n),f = as.double(rep(0,n)))$f
     return(f[ord])
   }
@@ -41,7 +41,7 @@ orderPed <- function(ped)
     dam <- match(ped[,2],ped[,1],nomatch = 0)
     sire <- match(ped[,3],ped[,1],nomatch = 0)
     n <- length(id)
-    ord <- .C("orderPed",ind = as.integer(id),dam = as.integer(dam),sire = as.integer(sire),
+    ord <- .C("CorderPed",ind = as.integer(id),dam = as.integer(dam),sire = as.integer(sire),
               n = as.integer(n),order = as.integer(rep(0,n)))$order
     if(-1%in%ord)
         warning("Be carefull, there are loops in the pedigree, individuals involved in the loop are indicated with a -1\n")
@@ -59,7 +59,7 @@ countGen <- function(ped)
     dam <- match(ped[,2],ped[,1],nomatch = 0)
     sire <- match(ped[,3],ped[,1],nomatch = 0)
     n <- length(id)
-    .C("countGen",ind = as.integer(id),dam = as.integer(dam),sire = as.integer(sire),
+    .C("CcountGen",ind = as.integer(id),dam = as.integer(dam),sire = as.integer(sire),
        n = as.integer(n),gen = as.integer(rep(0,n)))$gen
   }
 
@@ -74,7 +74,7 @@ makeAinv <- function(ped)
     dam <- match(ped[,2],ped[,1],nomatch = 0)
     sire <- match(ped[,3],ped[,1],nomatch = 0)
     n <- length(id)
-    res <- .C("getAinv",ind = as.integer(id),dam = as.integer(dam),sire = as.integer(sire),
+    res <- .C("CgetAinv",ind = as.integer(id),dam = as.integer(dam),sire = as.integer(sire),
               n = as.integer(n))
     return(TRUE)
   }
@@ -93,7 +93,7 @@ makeA <- function(ped,which)
     dam <- match(ped[,2],ped[,1],nomatch = 0)
     sire <- match(ped[,3],ped[,1],nomatch = 0)
     n <- length(id)
-    res <- .C("getA",ind = as.integer(id),dam = as.integer(dam),sire = as.integer(sire),
+    res <- .C("CgetA",ind = as.integer(id),dam = as.integer(dam),sire = as.integer(sire),
               n = as.integer(n),which = as.integer(which))
     return(TRUE)
   }
@@ -114,7 +114,7 @@ trimPed <- function(ped,data,ngenback = NULL)
     n <- length(id)
     if(is.null(ngenback))
       ngenback <- as.integer(max(countGen(ped)))
-    .C("trimPed",ind = as.integer(id),dam = as.integer(dam),sire = as.integer(sire),
+    .C("CtrimPed",ind = as.integer(id),dam = as.integer(dam),sire = as.integer(sire),
        data = as.integer(data),ngenback = as.integer(ngenback),n = as.integer(n))$data==1
   }
 

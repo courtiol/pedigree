@@ -25,6 +25,9 @@ sire <- c(0,0,2,2,3,5)
 ped <- data.frame(id,dam,sire)
 makeA(ped,which = c(rep(FALSE,4),rep(TRUE,2)))
 A <- read.table("A.txt")
+
+if(file.exists("A.txt"))
+file.remove("A.txt")
 }
 \keyword{utilities}
 
