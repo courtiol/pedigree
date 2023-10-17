@@ -389,9 +389,9 @@ extern "C"{
 }
 
 extern "C"{
-  void CgetAinv(int *ind,int *dam,int *sire,int *n)
+  void CgetAinv(int *ind,int *dam,int *sire,int *n, char **file)
   {
-    string aFile = "Ainv.txt";
+    string aFile = *file;
     pedigree *ped;
     iNode *IND;
     int i;
@@ -410,9 +410,9 @@ extern "C"{
 }
 
 extern "C" {
-  void CgetA (int *ind,int *dam,int *sire,int *n,int *which)
+  void CgetA (int *ind,int *dam,int *sire,int *n,int *which, char **file)
   {
-    string aFile = "A.txt";
+    string aFile = *file;
     pedigree *ped;
     iNode *IND;
     int i;

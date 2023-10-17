@@ -1,10 +1,10 @@
 Package: pedigree
 Type: Package
 Title: Pedigree Functions
-Version: 1.4.2
-Date: 2022-08-13
-Authors@R: c(person("Albart", "Coster", role = c("aut", "cre"), email =
-        "albart@dairyconsult.nl"))
+Version: 1.4.3
+Date: 2023-10-17
+Authors@R: c(person("Albart", "Coster", role = c("aut", "cre"), email = "albart@dairyconsult.nl"),
+             person("Alexandre", "Courtiol", role = c("ctb"), email = "alexandre.courtiol@gmail.com"))
 Depends: Matrix
 Imports: methods,HaploSim (>= 1.8.4),reshape
 Description: Pedigree related functions.

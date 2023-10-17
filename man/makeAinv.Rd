@@ -5,11 +5,19 @@
   Makes inverted A matrix for a pedigree and stores it in a file called
   \code{Ainv.txt}.}
   \usage{
-makeAinv(ped)
+makeAinv(ped,file)
+}
+\details{
+ The function does not output anything but writes the results into a file stored 
+ in the current working environment. This file is called 'Ainv.txt' by default, 
+ but you can change the file name using the \code{file} argument. This becomes 
+ mandatory when running different calls in parallel, otherwise the different 
+ instances would all write into the same file.
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{ped}{\code{data.frame} with three columns: id,id parent1,id parent2 }
+  \item{file}{Character string indicating the name of the file storing the computed information. See details.}
 }
 \value{
   Logical.
@@ -30,6 +38,15 @@ diag(Ainv) <- dd
 
 if(file.exists("Ainv.txt"))
 file.remove("Ainv.txt")
+
+## Adjusting file name explicitly
+
+makeAinv(ped,file = 'Ainv2.txt')
+Ai2 <- read.table('Ainv2.txt')
+if(file.exists('Ainv2.txt'))
+file.remove('Ainv2.txt')
+
+
 }
 \keyword{utilities}
 

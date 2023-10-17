@@ -63,7 +63,7 @@ countGen <- function(ped)
        n = as.integer(n),gen = as.integer(rep(0,n)))$gen
   }
 
-makeAinv <- function(ped)
+makeAinv <- function(ped,file = "Ainv.txt")
   {
     if(!is.data.frame(ped))stop("ped should be data.frame")
     ord <- orderPed(ped)
@@ -75,11 +75,11 @@ makeAinv <- function(ped)
     sire <- match(ped[,3],ped[,1],nomatch = 0)
     n <- length(id)
     res <- .C("CgetAinv",ind = as.integer(id),dam = as.integer(dam),sire = as.integer(sire),
-              n = as.integer(n))
+              n = as.integer(n),file = file)
     return(TRUE)
   }
 
-makeA <- function(ped,which)
+makeA <- function(ped,which,file = "A.txt")
   {
     if(!is.data.frame(ped))stop("ped should be data.frame")
     if(!is.logical(which))stop("which should be a logical")
@@ -94,7 +94,7 @@ makeA <- function(ped,which)
     sire <- match(ped[,3],ped[,1],nomatch = 0)
     n <- length(id)
     res <- .C("CgetA",ind = as.integer(id),dam = as.integer(dam),sire = as.integer(sire),
-              n = as.integer(n),which = as.integer(which))
+              n = as.integer(n),which = as.integer(which),file = file)
     return(TRUE)
   }
 
